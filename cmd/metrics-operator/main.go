@@ -24,8 +24,10 @@ import (
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
+
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -151,6 +153,7 @@ func main() {
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "82620e19.metrics.openmcp.cloud",
 		Logger:                 logger,
+		WebhookServer:          &webhook.DefaultServer{},
 		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
 		// when the Manager ends. This requires the binary to immediately end when the
 		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
@@ -209,6 +212,10 @@ func setupFederatedManagedMetricController(mgr ctrl.Manager) {
 }
 
 func setupMetricController(mgr ctrl.Manager) {
+	if err := metricsv1alpha1.SetupMetricsWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to register webhook", "webhook", "metric")
+		os.Exit(1)
+	}
 	if err := controller.NewMetricReconciler(mgr).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create reconciler", "controller", "metric")
 		os.Exit(1)
