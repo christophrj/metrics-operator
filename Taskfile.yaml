@@ -1,9 +1,9 @@
 version: 3
 
 vars:
-  API_DIRS: '{{.ROOT_DIR}}/api/v1alpha1/...'
+  API_DIRS: '{{.ROOT_DIR}}/api/...'
   MANIFEST_OUT: '{{.ROOT_DIR}}/cmd/metrics-operator/embedded/crds'
-  CODE_DIRS: '{{.ROOT_DIR}}/cmd/... {{.ROOT_DIR}}/internal/...  {{.ROOT_DIR}}/api/v1alpha1/...'
+  CODE_DIRS: '{{.ROOT_DIR}}/cmd/... {{.ROOT_DIR}}/internal/...  {{.ROOT_DIR}}/api/...'
   COMPONENTS: 'metrics-operator'
   REPO_NAME: 'https://github.com/openmcp-project/metrics-operator'
   REPO_URL: 'https://github.com/openmcp-project/metrics-operator'

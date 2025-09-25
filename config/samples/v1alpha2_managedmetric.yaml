@@ -1,0 +1,9 @@
+apiVersion: metrics.openmcp.cloud/v1alpha2
+kind: ManagedMetric
+metadata:
+  labels:
+    app.kubernetes.io/name: metrics-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: managedmetric-sample
+spec:
+  # TODO(user): Add fields here

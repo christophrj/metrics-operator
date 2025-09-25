@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- v1alpha2_managedmetric.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

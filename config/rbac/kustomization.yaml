@@ -30,6 +30,7 @@ resources:
 - federatedmanagedmetric_viewer_role.yaml
 - federatedmetric_editor_role.yaml
 - federatedmetric_viewer_role.yaml
+- managedmetric_admin_role.yaml
 - managedmetric_editor_role.yaml
 - managedmetric_viewer_role.yaml
 - metric_editor_role.yaml

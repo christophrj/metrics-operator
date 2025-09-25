@@ -26,6 +26,7 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -44,6 +45,7 @@ import (
 	"github.com/openmcp-project/metrics-operator/internal/controller"
 
 	metricsv1alpha1 "github.com/openmcp-project/metrics-operator/api/v1alpha1"
+	metricsv1alpha2 "github.com/openmcp-project/metrics-operator/api/v1alpha2"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -65,12 +67,19 @@ func init() {
 	utilruntime.Must(apiextensionsv1.AddToScheme(scheme))
 
 	utilruntime.Must(metricsv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(metricsv1alpha2.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 
 func runInit(setupClient client.Client) {
 	initContext := context.Background()
-
+	if crdFlags.Install {
+		// Install CRDs
+		if err := crds.Install(initContext, setupClient, crdFiles, crdFlags.InstallOptions...); err != nil {
+			setupLog.Error(err, "unable to install Custom Resource Definitions")
+			os.Exit(1)
+		}
+	}
 	if webhooksFlags.Install {
 		// Generate webhook certificate
 		if err := webhooks.GenerateCertificate(initContext, setupClient, webhooksFlags.CertOptions...); err != nil {
@@ -93,14 +102,6 @@ func runInit(setupClient client.Client) {
 		)
 		if err != nil {
 			setupLog.Error(err, "unable to configure webhooks")
-			os.Exit(1)
-		}
-	}
-
-	if crdFlags.Install {
-		// Install CRDs
-		if err := crds.Install(initContext, setupClient, crdFiles, crdFlags.InstallOptions...); err != nil {
-			setupLog.Error(err, "unable to install Custom Resource Definitions")
 			os.Exit(1)
 		}
 	}
@@ -151,6 +152,7 @@ func main() {
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "82620e19.metrics.openmcp.cloud",
 		Logger:                 logger,
+		WebhookServer:          &webhook.DefaultServer{},
 		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
 		// when the Manager ends. This requires the binary to immediately end when the
 		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
@@ -175,6 +177,8 @@ func main() {
 	setupFederatedMetricController(mgr)
 
 	setupFederatedManagedMetricController(mgr)
+
+	webhooks.SetupConversionWebhookWithManager(mgr)
 
 	// +kubebuilder:scaffold:builder
 

@@ -54,4 +54,11 @@ resources:
   kind: FederatedManagedMetric
   path: github.com/openmcp-project/metrics-operator/api/v1alpha1
   version: v1beta1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: metrics.openmcp.cloud
+  kind: ManagedMetric
+  path: github.com/openmcp-project/metrics-operator/api/v1alpha2
+  version: v1alpha2
 version: "3"

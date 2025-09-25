@@ -64,6 +64,9 @@ func (m *MockClient) Get(ctx context.Context, key client.ObjectKey, obj client.O
 func (m *MockClient) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
 	return nil
 }
+func (m *MockClient) Apply(ctx context.Context, obj runtime.ApplyConfiguration, opts ...client.ApplyOption) error {
+	return nil
+}
 func (m *MockClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	return nil
 }
