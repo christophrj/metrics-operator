@@ -66,9 +66,16 @@ func (h *ManagedHandler) sendStatusBasedMetricValue(ctx context.Context) (string
 		}
 
 		// Add GVK dimensions
-		dataPoint.AddDimension(KIND, h.metric.Spec.Kind)
-		dataPoint.AddDimension(GROUP, h.metric.Spec.Group)
-		dataPoint.AddDimension(VERSION, h.metric.Spec.Version)
+		if h.metric.Spec.Target != nil {
+			dataPoint.AddDimension(KIND, h.metric.Spec.Target.Kind)
+			dataPoint.AddDimension(GROUP, h.metric.Spec.Target.Group)
+			dataPoint.AddDimension(VERSION, h.metric.Spec.Target.Version)
+
+		} else {
+			dataPoint.AddDimension(KIND, h.metric.Spec.Kind)
+			dataPoint.AddDimension(GROUP, h.metric.Spec.Group)
+			dataPoint.AddDimension(VERSION, h.metric.Spec.Version)
+		}
 
 		// Add status conditions as dimensions
 		for typ, state := range cr.Status {

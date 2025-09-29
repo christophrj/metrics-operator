@@ -30,11 +30,17 @@ type ManagedMetricSpec struct {
 	// Sets the description that will be used to identify the metric in Dynatrace(or other providers)
 	// +optional
 	Description string `json:"description,omitempty"`
+	// Defines which managed resources to observe
+	// +optional
+	Target *GroupVersionKind `json:"target,omitempty"`
 	// Decide which kind the metric should keep track of (needs to be plural version)
+	// Deprecated: Use `target.kind` instead
 	Kind string `json:"kind,omitempty"`
 	// Define the group of your object that should be instrumented (without version at the end)
+	// Deprecated: Use `target.group` instead
 	Group string `json:"group,omitempty"`
 	// Define version of the object you want to intrsument
+	// Deprecated: Use `target.version` instead
 	Version string `json:"version,omitempty"`
 	// Define labels of your object to adapt filters of the query
 	// +optional
@@ -92,8 +98,8 @@ type ManagedMetricStatus struct {
 
 // GvkToString returns group, version and kind as a string
 func (r *ManagedMetric) GvkToString() string {
-	if r.Spec.Group == "" {
-		return fmt.Sprintf("/%s, Kind=%s", r.Spec.Version, r.Spec.Kind)
+	if r.Spec.Target != nil {
+		return r.Spec.Target.GVK().String()
 	}
 	return fmt.Sprintf("%s/%s, Kind=%s", r.Spec.Group, r.Spec.Version, r.Spec.Kind)
 }
